@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GenAI Assistant</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:900px;
+    min-height:80vh;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(15px);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:25px;
+    padding:35px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.4);
+}
+
+.header{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.header h1{
+    color:white;
+    font-size:3rem;
+    font-weight:700;
+}
+
+.header p{
+    color:#cbd5e1;
+    margin-top:10px;
+}
+
+textarea{
+    width:100%;
+    height:180px;
+    resize:none;
+    border:none;
+    outline:none;
+    padding:20px;
+    border-radius:18px;
+    font-size:17px;
+    background:#f8fafc;
+}
+
+.button-group{
+    display:flex;
+    gap:15px;
+    margin-top:20px;
+}
+
+button{
+    flex:1;
+    padding:15px;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    font-size:17px;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.generate-btn{
+    background:#2563eb;
+    color:white;
+}
+
+.generate-btn:hover{
+    background:#1d4ed8;
+    transform:translateY(-2px);
+}
+
+.clear-btn{
+    background:#ef4444;
+    color:white;
+}
+
+.clear-btn:hover{
+    background:#dc2626;
+    transform:translateY(-2px);
+}
+
+.response-box{
+    margin-top:25px;
+    background:white;
+    border-radius:20px;
+    padding:25px;
+    min-height:250px;
+    overflow-y:auto;
+}
+
+.response-title{
+    color:#2563eb;
+    font-size:1.2rem;
+    font-weight:600;
+    margin-bottom:15px;
+}
+
+#response{
+    line-height:1.8;
+    color:#1e293b;
+    font-size:16px;
+}
+
+.loader{
+    display:none;
+    text-align:center;
+    margin-top:20px;
+    color:white;
+    font-size:18px;
+}
+
+.footer{
+    text-align:center;
+    color:#94a3b8;
+    margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>🤖 GenAI Assistant</h1>
+        <p>Powered by FastAPI + Groq + Llama 3.3</p>
+    </div>
+
+    <textarea
+        id="prompt"
+        placeholder="Ask anything... Example: Explain Machine Learning in simple words">
+    </textarea>
+
+    <div class="button-group">
+
+        <button class="generate-btn" onclick="generateText()">
+            Generate Response
+        </button>
+
+        <button class="clear-btn" onclick="clearAll()">
+            Clear
+        </button>
+
+    </div>
+
+    <div class="loader" id="loader">
+        Generating Response...
+    </div>
+
+    <div class="response-box">
+
+        <div class="response-title">
+            AI Response
+        </div>
+
+        <div id="response">
+            Your AI response will appear here...
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Internship Project • Generative AI Assistant
+    </div>
+
+</div>
+
+<script>
+
+async function generateText(){
+
+    const prompt=document.getElementById("prompt").value;
+
+    if(prompt.trim()===""){
+        alert("Please enter a prompt");
+        return;
+    }
+
+    document.getElementById("loader").style.display="block";
+
+    try{
+
+        const response=await fetch(
+            "http://127.0.0.1:8000/generate",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    prompt:prompt
+                })
+            }
+        );
+
+        const data=await response.json();
+
+        document.getElementById("response").innerHTML=
+            data.response;
+
+    }
+
+    catch(error){
+
+        document.getElementById("response").innerHTML=
+            "Error connecting to FastAPI server.";
+
+    }
+
+    document.getElementById("loader").style.display="none";
+
+}
+
+function clearAll(){
+
+    document.getElementById("prompt").value="";
+    document.getElementById("response").innerHTML=
+    "Your AI response will appear here...";
+
+}
+
+</script>
+
+</body>
+</html>
